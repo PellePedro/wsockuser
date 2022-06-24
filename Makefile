@@ -13,6 +13,7 @@ build-image:
 
 .PHONY: build-push
 build-push:
+	docker  buildx create --name mybuilder
 	docker buildx use mybuilder
 	docker buildx build --push --tag $(NAME):$(TAG) -f docker/user/Dockerfile-release . -o type=image --platform=linux/arm64,linux/amd64 
 	docker buildx build --push --tag $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db -o type=image --platform=linux/arm64,linux/amd64

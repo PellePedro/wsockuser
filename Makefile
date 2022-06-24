@@ -1,21 +1,18 @@
-NAME = weaveworksdemos/user
-DBNAME = weaveworksdemos/user-db
-INSTANCE = user
-TESTDB = weaveworkstestuserdb
-OPENAPI = $(INSTANCE)-testopenapi
-GROUP = weaveworksdemos
+NAME = pellepedro/weavesocks_user
+DBNAME = pellepedro/weavesocks_user_db
 TAG = latest
 
-default: docker
+default: build-image
 
 
-test:
-	@docker build -t $(INSTANCE)-test -f ./Dockerfile-test .
-	@docker run --rm -it $(INSTANCE)-test /bin/sh -c 'glide novendor| xargs go test -v'
-
-.PHONY: docker
-docker:
+.PHONY: build-image
+build-image:
 	docker buildx use mybuilder
 	docker buildx build --tag $(NAME):$(TAG) -f docker/user/Dockerfile-release . -o type=image --platform=linux/arm64,linux/amd64 
 	docker buildx build --tag $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db -o type=image --platform=linux/arm64,linux/amd64
 
+.PHONY: build-push
+build-push:
+	docker buildx use mybuilder
+	docker buildx build --push --tag $(NAME):$(TAG) -f docker/user/Dockerfile-release . -o type=image --platform=linux/arm64,linux/amd64 
+	docker buildx build --push --tag $(DBNAME):$(TAG) -f docker/user-db/Dockerfile docker/user-db -o type=image --platform=linux/arm64,linux/amd64
